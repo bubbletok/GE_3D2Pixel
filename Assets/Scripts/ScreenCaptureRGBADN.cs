@@ -9,6 +9,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
     int captureWidth;
     int captureHeight;
     int captureNumber;
+    [SerializeField] string fPath;
     [SerializeField] private Material defaultShader;
     [SerializeField] private Material normalShader;
     [SerializeField] private Material depthShader;
@@ -65,7 +66,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
         // PNG∑Œ ¿˙¿Â
         byte[] bytes = screenshot.EncodeToPNG();
-        string filePath = Path.Combine(Application.dataPath, $"../Screenshots/{fileName}.png");
+        string filePath = Path.Combine(Application.dataPath,fPath,$"{fileName}.png");
         Directory.CreateDirectory(Path.GetDirectoryName(filePath));
         File.WriteAllBytes(filePath, bytes);
 
