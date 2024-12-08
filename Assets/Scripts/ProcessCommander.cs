@@ -14,7 +14,7 @@ public class ProcessCommander : MonoBehaviour
     [SerializeField] private string repoPath;
     [SerializeField] private string envName;
     [SerializeField] private string dataPath;
-    [Range(1, 64)] [SerializeField] private int cellSize;
+    [Range(1, 128)] [SerializeField] private int cellSize;
     [SerializeField] private string modelName;
 
     private Process _cmdProcess;

@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 public class ScreenCaptureRGBADN : MonoBehaviour
 {
-    private Camera depthCamera;
+    [SerializeField] private Camera depthCamera;
     int captureWidth;
     int captureHeight;
     int captureNumber;
@@ -16,7 +14,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
     Material currmaterial;
     RenderTexture rt;
 
-    private void CaptureWithShader(Material mat, string fileName,int shadertype)
+    private void CaptureWithShader(Material mat, string fileName, int shadertype, bool savePng = false)
     {
         //// 렌더 텍스처 생성
         //RenderTexture renderTexture = new RenderTexture(captureWidth, captureHeight, 36);
@@ -66,9 +64,19 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
         // PNG로 저장
         byte[] bytes = screenshot.EncodeToPNG();
-        string filePath = Path.Combine(fPath,$"{fileName}.png");
-        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-        File.WriteAllBytes(filePath, bytes);
+        string filePath = Path.Combine(fPath, $"{fileName}.png");
+        if (savePng)
+        {
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                if (Directory.Exists(filePath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                }
+
+                File.WriteAllBytes(filePath, bytes);
+            }
+        }
 
         // 원래 카메라 설정 복구
 
@@ -87,8 +95,9 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
     void CaptureDefault(string fileName)
     {
-        CaptureWithShader(defaultShader, fileName + "_Default",0);
+        CaptureWithShader(defaultShader, fileName + "_Default", 0, true);
     }
+
     void CaptureDepth(string fileName)
     {
         CaptureWithShader(depthShader, fileName + "_Depth", 1);
@@ -101,6 +110,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
         CaptureDepth(fileName);
         Debug.Log("Capture Created");
     }
+
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         Graphics.Blit(source, rt, currmaterial);
@@ -110,18 +120,18 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-     {
-        depthCamera = GetComponent<Camera>();
+    {
+        //depthCamera = GetComponent<Camera>();
         captureHeight = depthCamera.pixelHeight;
         captureWidth = depthCamera.pixelWidth;
         captureNumber = 0;
         currmaterial = defaultShader;
-     }
+    }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.C))
         {
             CaptureAll("Capture" + captureNumber);
             //CaptureDefault("Capture" + captureNumber);
