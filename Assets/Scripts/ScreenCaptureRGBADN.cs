@@ -66,7 +66,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
         // PNG∑Œ ¿˙¿Â
         byte[] bytes = screenshot.EncodeToPNG();
-        string filePath = Path.Combine(Application.dataPath,fPath,$"{fileName}.png");
+        string filePath = Path.Combine(fPath,$"{fileName}.png");
         Directory.CreateDirectory(Path.GetDirectoryName(filePath));
         File.WriteAllBytes(filePath, bytes);
 

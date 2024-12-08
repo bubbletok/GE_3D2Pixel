@@ -18,10 +18,11 @@ public class ProcessCommander : MonoBehaviour
     [SerializeField] private string modelName;
 
     private Process _cmdProcess;
-    private bool _isInitialized;
-    private Task _initTask;
-    private Task _testProTask;
-    private static Task _readingTask;
+    private static bool _isInitialized;
+    private static bool _isCommandCompleted;
+    /*private Task _initTask;
+    private static Task _testProTask;
+    private static Task _readingTask;*/
 
     private readonly List<string> _initCommands = new();
     private readonly List<string> _testProCommand = new();
@@ -31,11 +32,13 @@ public class ProcessCommander : MonoBehaviour
         CloseAllCmd();
         ExecuteCmd(out _cmdProcess);
         InitCommands();
-        _initTask = new Task(() => ExecuteCmdCommand(_cmdProcess, _initCommands));
-        _initTask.Start();
-        _testProTask = new Task(() => ExecuteCmdCommand(_cmdProcess, _testProCommand));
-        _readingTask = new Task(() => ReadOutput(_cmdProcess));
-        _readingTask.Start();
+        Task.Run(() => ExecuteCmdCommand(_cmdProcess, _initCommands));
+        //_initTask = new Task(() => ExecuteCmdCommand(_cmdProcess, _initCommands));
+        //_initTask.Start();
+        //_testProTask = new Task(() => ExecuteCmdCommand(_cmdProcess, _testProCommand));
+        Task.Run(() => ReadOutput(_cmdProcess));
+        //_readingTask = new Task(() => ReadOutput(_cmdProcess));
+        //_readingTask.Start();
     }
 
     private void InitCommands()
@@ -45,6 +48,13 @@ public class ProcessCommander : MonoBehaviour
         _initCommands.Add($"conda activate {envName}");
         _testProCommand.Add(
             $"python test_pro.py --input ./datasets/{dataPath}/Input --cell_size {cellSize} --model_name {modelName}");
+    }
+
+    private void UpdateCommands()
+    {
+        _initCommands.Clear();
+        _testProCommand.Clear();
+        InitCommands();
     }
 
     private void ExecuteCmd(out Process process)
@@ -75,11 +85,13 @@ public class ProcessCommander : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            if (_isInitialized && _testProTask.Status != TaskStatus.Running)
+            if (_isInitialized && _isCommandCompleted/*&& _testProTask.Status != TaskStatus.Running*/)
             {
-                _testProTask.Start();
+                _isCommandCompleted = false;
+                UpdateCommands();
+                Task.Run(() => ExecuteCmdCommand(_cmdProcess, _testProCommand));
             }
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
@@ -88,20 +100,7 @@ public class ProcessCommander : MonoBehaviour
             _cmdProcess = null;
         }
     }
-
-    /*private void LateUpdate()
-    {
-        int count = OutputQueue.Count;
-        if (count > 5)
-        {
-            while (OutputQueue.Count > 0)
-            {
-                string output = OutputQueue.Dequeue();
-                print($"output: {output}");
-            }
-        }
-    }*/
-
+    
     private static void ExecuteCmdCommand(Process process, List<string> commands)
     {
         if (process != null)
@@ -111,17 +110,10 @@ public class ProcessCommander : MonoBehaviour
                 print($"Run command: {command}");
                 process.StandardInput.WriteLine(command);
             }
-
-            /*string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();*/
-
             process.StandardInput.Flush();
-            //print($"final output: {output}");
-            /*if (!string.IsNullOrEmpty(error))
-            {
-                Debug.LogError($"Error executing command: {error}");
-            }*/
         }
+
+        _isCommandCompleted = true;
     }
 
     private static void ReadOutput(Process process)
@@ -138,12 +130,6 @@ public class ProcessCommander : MonoBehaviour
 
     void OnDestroy()
     {
-        if (_testProTask is { Status: TaskStatus.RanToCompletion }) // _cmdTask!=null && status==RanToCompletion
-        {
-            _testProTask.Dispose();
-            _testProTask = null;
-        }
-
         CloseAllCmd();
     }
 
