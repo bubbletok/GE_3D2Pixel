@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ScreenCaptureRGBADN : MonoBehaviour
 {
-    [SerializeField] private Camera depthCamera;
+    private Camera depthCamera;
     int captureWidth;
     int captureHeight;
     int captureNumber;
@@ -95,10 +95,10 @@ public class ScreenCaptureRGBADN : MonoBehaviour
         CaptureDepth(fileName);
         Debug.Log("Capture Created");
     }
-
-
+    
     void Start()
     {
+        depthCamera = GetComponent<Camera>();
         captureHeight = depthCamera.pixelHeight;
         captureWidth = depthCamera.pixelWidth;
         captureNumber = 0;
