@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -26,7 +25,6 @@ public class ProcessCommander : MonoBehaviour
 
     private readonly List<string> _initCommands = new();
     private readonly List<string> _testProCommand = new();
-    //private static readonly Queue<string> OutputQueue = new();
 
     private void Awake()
     {
@@ -126,12 +124,12 @@ public class ProcessCommander : MonoBehaviour
         }
     }
 
-    private void ReadOutput(Process process)
+    private static void ReadOutput(Process process)
     {
         while (true)
         {
             string tmpOutput = process.StandardOutput.ReadLine();
-            if (tmpOutput is not "" && tmpOutput is not " ")
+            if (!string.IsNullOrEmpty(tmpOutput))
             {
                 print($"output: {tmpOutput}");
             }

@@ -356,7 +356,7 @@ MonoBehaviour:
   repoPath: C:\Users\ghdth\Pixelization
   envName: lstm_test
   dataPath: TEST_DATA
-  cellSize: 8
+  cellSize: 64
   modelName: test
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
