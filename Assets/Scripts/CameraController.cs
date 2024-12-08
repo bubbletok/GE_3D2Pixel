@@ -23,9 +23,9 @@ public class CameraController : MonoBehaviour
             transform.eulerAngles += new Vector3(-mouseY * rotateSpeed, mouseX * rotateSpeed, 0);
         }
         
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Q))
             transform.position += Vector3.up * (moveSpeed * Time.deltaTime);
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.E))
             transform.position += Vector3.down * (moveSpeed * Time.deltaTime);
     }
 }
