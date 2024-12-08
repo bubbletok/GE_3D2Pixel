@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 
-public class NormalMapExtractor : MonoBehaviour
+public class DepthNormalMapExtractor : MonoBehaviour
 {
     private Camera depthCamera;
     private RenderTexture depthTexture;
@@ -24,7 +24,7 @@ public class NormalMapExtractor : MonoBehaviour
         grayScaleTexture.format = RenderTextureFormat.RFloat;
 
         // 카메라 설정
-        depthCamera.depthTextureMode = DepthTextureMode.DepthNormals;
+        depthCamera.depthTextureMode = DepthTextureMode.Depth;
         depthCamera.targetTexture = depthTexture;
 
         if (convertMaterial == null)
@@ -49,7 +49,7 @@ public class NormalMapExtractor : MonoBehaviour
     {
         // depth normal을 grayscale로 변환
         Graphics.Blit(source, grayScaleTexture, convertMaterial);
-        Graphics.Blit(grayScaleTexture, destination);
+        Graphics.Blit(grayScaleTexture, destination);   
     }
     
     public void SaveDepthMapPNG()
@@ -75,6 +75,11 @@ public class NormalMapExtractor : MonoBehaviour
         timestamp++;
 
         Destroy(depthMap);
+    }
+
+    public void SaveColorMapPNG()
+    {
+        
     }
 
 
