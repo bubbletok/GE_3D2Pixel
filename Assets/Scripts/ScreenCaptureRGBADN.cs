@@ -16,53 +16,31 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
     private void CaptureWithShader(Material mat, string fileName, int shadertype, bool savePng = false)
     {
-        //// 렌더 텍스처 생성
-        //RenderTexture renderTexture = new RenderTexture(captureWidth, captureHeight, 36);
-
-        //// 카메라의 타겟 텍스처를 임시로 변경
-        //RenderTexture previousRT = depthCamera.targetTexture;
-        //depthCamera.targetTexture = renderTexture;
-
-        //// 새로운 텍스처 생성
-        //Texture2D screenshot = new Texture2D(captureWidth, captureHeight, TextureFormat.RGBAFloat, false);
-
-        ////var previousRenderFlags = depthCamera.clearFlags;
-        //if(shadertype != 0)
-        //{
-        //    depthCamera.depthTextureMode = DepthTextureMode.DepthNormals;
-        //    depthCamera.SetReplacementShader(shader, "");
-        //}
-        //else
-        //{
-        //    depthCamera.depthTextureMode = DepthTextureMode.None;
-        //    depthCamera.ResetReplacementShader();
-        //}
-
-
-        //// 렌더 텍스처를 활성화하고 픽셀 읽기
-        //RenderTexture.active = renderTexture;
-        //screenshot.ReadPixels(new Rect(0, 0, captureWidth, captureHeight), 0, 0);
-        //screenshot.Apply();
-
         RenderTexture renderTexture = new RenderTexture(captureWidth, captureHeight, 36);
+        //렌더 텍스쳐를 생성하여
         depthCamera.targetTexture = renderTexture;
+        //현재 타겟 텍스쳐에 할당한다.
         depthCamera.depthTextureMode = DepthTextureMode.DepthNormals;
+        //Depth와 Normal 값을 받아올 수 있도록 모드를 변경한다.
         currmaterial = mat;
         depthCamera.Render();
+        //Render를 진행하여 아래있는 OnRenderImage를 작동시키고, 현재 타겟 텍스쳐인 Render Texture가 그 값을 받을 수 있도록 한다.
 
         depthCamera.targetTexture = null;
 
         RenderTexture.active = renderTexture;
+        //활성화된 렌더 텍스쳐를 해당 값으로 변경한 후
         rt = renderTexture;
 
         Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.ARGB32, false);
         texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
         texture.Apply();
+        //텍스쳐의 데이터를 읽는다.
 
         Texture2D screenshot = texture;
         RenderTexture.active = null;
 
-        // PNG로 저장
+        //저장한 텍스쳐의 데이터를 파일 위치로 저장한다.
         byte[] bytes = screenshot.EncodeToPNG();
         string filePath = Path.Combine(fPath, $"{fileName}.png");
         if (savePng)
@@ -86,6 +64,13 @@ public class ScreenCaptureRGBADN : MonoBehaviour
         Destroy(screenshot);
 
         Debug.Log($"Screenshot saved: {filePath}");
+    }
+    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    {
+        //현재 소스를 전달받은 매터리얼으로 변환한다.
+        Graphics.Blit(source, rt, currmaterial);
+        //변환한 값을 그린다.
+        Graphics.Blit(rt, destination);
     }
 
     void CaptureNormal(string fileName)
@@ -111,30 +96,20 @@ public class ScreenCaptureRGBADN : MonoBehaviour
         Debug.Log("Capture Created");
     }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
-    {
-        Graphics.Blit(source, rt, currmaterial);
-        Graphics.Blit(rt, destination);
-    }
 
-
-    // Start is called before the first frame update
     void Start()
     {
-        //depthCamera = GetComponent<Camera>();
         captureHeight = depthCamera.pixelHeight;
         captureWidth = depthCamera.pixelWidth;
         captureNumber = 0;
         currmaterial = defaultShader;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
             CaptureAll("Capture" + captureNumber);
-            //CaptureDefault("Capture" + captureNumber);
             captureNumber++;
         }
     }

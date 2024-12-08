@@ -45,15 +45,15 @@ Shader "Custom/Depth"
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 depthnormal = tex2D(_CameraDepthNormalsTexture, i.uv);
+                //sampler에서 제공하는 depthnormal값을 받아온다.
 
                 float3 normal;
                 float depth;
                 DecodeDepthNormal(depthnormal, depth, normal);
-                depth = depth*10;
-                float alpha = depth > 5 ? 0 : 1;
-                // depth를 0-1 사이의 grayscale로 변환
-                return float4(depth,depth,depth,alpha);
-                //return float4(depth,depth,depth,1.0);
+                //해당 depthnormal값을 depth와 normal으로 분리한다.
+                depth = depth*10; //depth값을 원하는 배율에 맞게 조정하고
+                float alpha = depth > 5 ? 0 : 1; //배경을 제외하기 위해 알파값을 설정한다.
+                return float4(depth,depth,depth,alpha);//그레이스케일에 알파값을 적용하여 반환한다.
             }
             ENDCG
         }
