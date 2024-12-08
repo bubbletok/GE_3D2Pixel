@@ -8,8 +8,10 @@ using Debug = UnityEngine.Debug;
 
 public class ProcessCommander : MonoBehaviour
 {
-    [Header("Test Settings")] [SerializeField]
-    private string driverPath;
+    [SerializeField] private PixelConverter pixelConverter;
+
+    [Header("Test Settings")]
+    [SerializeField] private string driverPath;
 
     [SerializeField] private string repoPath;
     [SerializeField] private string envName;
@@ -20,25 +22,19 @@ public class ProcessCommander : MonoBehaviour
     private Process _cmdProcess;
     private static bool _isInitialized;
     private static bool _isCommandCompleted;
-    /*private Task _initTask;
-    private static Task _testProTask;
-    private static Task _readingTask;*/
 
     private readonly List<string> _initCommands = new();
     private readonly List<string> _testProCommand = new();
 
-    private void Awake()
+    private void Start()
     {
         CloseAllCmd();
         ExecuteCmd(out _cmdProcess);
         InitCommands();
         Task.Run(() => ExecuteCmdCommand(_cmdProcess, _initCommands));
-        //_initTask = new Task(() => ExecuteCmdCommand(_cmdProcess, _initCommands));
-        //_initTask.Start();
-        //_testProTask = new Task(() => ExecuteCmdCommand(_cmdProcess, _testProCommand));
         Task.Run(() => ReadOutput(_cmdProcess));
-        //_readingTask = new Task(() => ReadOutput(_cmdProcess));
-        //_readingTask.Start();
+
+        pixelConverter.OnPostCapture.AddListener(RunTestPro);
     }
 
     private void InitCommands()
@@ -85,22 +81,22 @@ public class ProcessCommander : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        /*if (Input.GetKeyDown(KeyCode.P))
         {
-            if (_isInitialized && _isCommandCompleted/*&& _testProTask.Status != TaskStatus.Running*/)
-            {
-                _isCommandCompleted = false;
-                UpdateCommands();
-                Task.Run(() => ExecuteCmdCommand(_cmdProcess, _testProCommand));
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape))
+            RunTestPro();
+        }*/
+    }
+
+    private void RunTestPro()
+    {
+        if (_isInitialized && _isCommandCompleted)
         {
-            ExitCmd(_cmdProcess);
-            _cmdProcess = null;
+            _isCommandCompleted = false;
+            UpdateCommands();
+            Task.Run(() => ExecuteCmdCommand(_cmdProcess, _testProCommand));
         }
     }
-    
+
     private static void ExecuteCmdCommand(Process process, List<string> commands)
     {
         if (process != null)
@@ -110,6 +106,7 @@ public class ProcessCommander : MonoBehaviour
                 print($"Run command: {command}");
                 process.StandardInput.WriteLine(command);
             }
+
             process.StandardInput.Flush();
         }
 
@@ -149,21 +146,6 @@ public class ProcessCommander : MonoBehaviour
             {
                 Debug.LogError($"Error closing cmd process: {e}");
             }
-        }
-    }
-
-    private void ExitCmd(Process process)
-    {
-        try
-        {
-            if (process is null) return;
-            process.Kill();
-            process.WaitForExit();
-            process.Dispose();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error while exiting cmd process: {e}");
         }
     }
 }
