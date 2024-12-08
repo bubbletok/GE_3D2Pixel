@@ -21,11 +21,11 @@ public class DepthNormalMapExtractor : MonoBehaviour
 
         // grayscale texture 생성
         grayScaleTexture = new RenderTexture(Screen.width, Screen.height, 0);
-        grayScaleTexture.format = RenderTextureFormat.RFloat;
+        grayScaleTexture.format = RenderTextureFormat.ARGBFloat;
 
         // 카메라 설정
-        depthCamera.depthTextureMode = DepthTextureMode.Depth;
-        depthCamera.targetTexture = depthTexture;
+        depthCamera.depthTextureMode = DepthTextureMode.DepthNormals;
+        depthCamera.targetTexture = grayScaleTexture;
 
         if (convertMaterial == null)
         {
@@ -57,7 +57,7 @@ public class DepthNormalMapExtractor : MonoBehaviour
         RenderTexture currentRT = RenderTexture.active;
         RenderTexture.active = grayScaleTexture;
 
-        Texture2D depthMap = new Texture2D(grayScaleTexture.width, grayScaleTexture.height, TextureFormat.RFloat, false);
+        Texture2D depthMap = new Texture2D(grayScaleTexture.width, grayScaleTexture.height, TextureFormat.RGBAFloat, false);
         depthMap.ReadPixels(new Rect(0, 0, grayScaleTexture.width, grayScaleTexture.height), 0, 0);
         depthMap.Apply();
 
