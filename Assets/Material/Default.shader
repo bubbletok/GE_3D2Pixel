@@ -1,4 +1,4 @@
-Shader "Custom/DepthNormal"
+Shader "Custom/Default"
 {
     Properties
     {
@@ -32,7 +32,6 @@ Shader "Custom/DepthNormal"
             };
 
             sampler2D _MainTex;
-            sampler2D _CameraDepthNormalsTexture;
 
             v2f vert(appdata v)
             {
@@ -44,16 +43,8 @@ Shader "Custom/DepthNormal"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float4 depthnormal = tex2D(_CameraDepthNormalsTexture, i.uv);
-
-                float3 normal;
-                float depth;
-                DecodeDepthNormal(depthnormal, depth, normal);
-                depth = depth*10;
-                float alpha = depth > 0 ? 0 : 1;
-                // depth를 0-1 사이의 grayscale로 변환
-                return float4(normal.xyz,1.0);
-                //return float4(depth,depth,depth,1.0);
+                fixed4 col = tex2D(_MainTex, i.uv);
+                return col;
             }
             ENDCG
         }

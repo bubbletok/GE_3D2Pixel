@@ -1,4 +1,4 @@
-Shader "Custom/DepthNormal"
+Shader "Custom/Depth"
 {
     Properties
     {
@@ -50,9 +50,9 @@ Shader "Custom/DepthNormal"
                 float depth;
                 DecodeDepthNormal(depthnormal, depth, normal);
                 depth = depth*10;
-                float alpha = depth > 0 ? 0 : 1;
+                float alpha = depth > 5 ? 0 : 1;
                 // depth를 0-1 사이의 grayscale로 변환
-                return float4(normal.xyz,1.0);
+                return float4(depth,depth,depth,alpha);
                 //return float4(depth,depth,depth,1.0);
             }
             ENDCG

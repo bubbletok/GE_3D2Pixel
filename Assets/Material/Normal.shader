@@ -1,4 +1,4 @@
-Shader "Custom/DepthNormal"
+Shader "Custom/Normal"
 {
     Properties
     {
@@ -38,7 +38,7 @@ Shader "Custom/DepthNormal"
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
+                o.uv = float2(v.uv.x, 1 - v.uv.y);
                 return o;
             }
 
@@ -49,10 +49,10 @@ Shader "Custom/DepthNormal"
                 float3 normal;
                 float depth;
                 DecodeDepthNormal(depthnormal, depth, normal);
-                depth = depth*10;
-                float alpha = depth > 0 ? 0 : 1;
+                float alpha = depth<0.5? 1:0;
                 // depth를 0-1 사이의 grayscale로 변환
-                return float4(normal.xyz,1.0);
+                normal.y = -normal.y;
+                return float4(normal.xyz,alpha);
                 //return float4(depth,depth,depth,1.0);
             }
             ENDCG
