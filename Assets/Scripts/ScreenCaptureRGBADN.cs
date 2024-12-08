@@ -1,8 +1,11 @@
 using System.IO;
 using UnityEngine;
+using Task = System.Threading.Tasks.Task;
 
 public class ScreenCaptureRGBADN : MonoBehaviour
 {
+    [SerializeField] private PixelConverter pixelConverter;
+
     private Camera depthCamera;
     int captureWidth;
     int captureHeight;
@@ -63,7 +66,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
         Destroy(renderTexture);
         Destroy(screenshot);
 
-        Debug.Log($"Screenshot saved: {filePath}");
+        //print($"Screenshot saved: {filePath}");
     }
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
@@ -75,7 +78,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
     void CaptureNormal(string fileName)
     {
-        CaptureWithShader(normalShader, fileName + "_Normal", 1);
+        CaptureWithShader(normalShader, fileName + "_Normal", 1, true);
     }
 
     void CaptureDefault(string fileName)
@@ -85,7 +88,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
 
     void CaptureDepth(string fileName)
     {
-        CaptureWithShader(depthShader, fileName + "_Depth", 1);
+        CaptureWithShader(depthShader, fileName + "_Depth", 1, true);
     }
 
     void CaptureAll(string fileName)
@@ -93,7 +96,7 @@ public class ScreenCaptureRGBADN : MonoBehaviour
         CaptureNormal(fileName);
         CaptureDefault(fileName);
         CaptureDepth(fileName);
-        Debug.Log("Capture Created");
+        Debug.Log($"Capture{captureNumber} Created");
     }
     
     void Start()
@@ -103,14 +106,12 @@ public class ScreenCaptureRGBADN : MonoBehaviour
         captureWidth = depthCamera.pixelWidth;
         captureNumber = 0;
         currmaterial = defaultShader;
+        pixelConverter.OnCapture.AddListener(SceneCapture);
     }
 
-    void Update()
+    void SceneCapture()
     {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            CaptureAll("Capture" + captureNumber);
-            captureNumber++;
-        }
+        CaptureAll("Capture" + captureNumber++);
+        currmaterial = defaultShader;
     }
 }

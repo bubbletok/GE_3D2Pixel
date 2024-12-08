@@ -35,6 +35,7 @@ public class ProcessCommander : MonoBehaviour
         Task.Run(() => ReadOutput(_cmdProcess));
 
         pixelConverter.OnPostCapture.AddListener(RunTestPro);
+        pixelConverter.OnPostCapture.AddListener(() => pixelConverter.IsConvertCompleted = true);
     }
 
     private void InitCommands()

@@ -17,10 +17,13 @@ public class PixelConverter : MonoBehaviour
     private void Update()
     {
         HandleInput();
-        if (IsCaptureCompleted)
+        if (IsConvertCompleted)
+        {
+            IsOnProgress = false;
+        }
+        else if (IsCaptureCompleted)
         {
             OnPostCapture.Invoke();
-            IsOnProgress = false;
             IsCaptureCompleted = false;
         }
         else if (IsOnProgress)
